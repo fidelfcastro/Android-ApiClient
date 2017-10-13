@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.androidapp.fidel.apiclient.MainActivity">
+
+    <Button
+        android:id="@+id/addPostButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add "
+        android:layout_below="@+id/textView2"
+        android:layout_toStartOf="@+id/viewPostButton" />
+
+    <TextView
+        android:id="@+id/postTxtView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Post Response"
+        android:layout_below="@+id/viewPostButton"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:id="@+id/viewPostButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="View "
+        android:layout_alignBaseline="@+id/addPostButton"
+        android:layout_alignBottom="@+id/addPostButton"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:id="@+id/commentsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add"
+        android:layout_alignTop="@+id/commentsId"
+        android:layout_alignStart="@+id/addPostButton" />
+
+    <TextView
+        android:id="@+id/commentsTxtView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Comments Response"
+        android:layout_marginTop="16dp"
+        android:layout_below="@+id/commentsButton"
+        android:layout_alignParentStart="true" />
+        <!--android:layout_below="@+id/commentsButton"-->
+        <!--android:layout_alignEnd="@+id/commentsButton" />-->
+
+    <Button
+        android:id="@+id/viewCommentsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="View"
+        android:layout_alignBaseline="@+id/commentsButton"
+        android:layout_alignBottom="@+id/commentsButton"
+        android:layout_alignParentEnd="true" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="POSTS"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="COMMENTS"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:id="@+id/postId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="numberSigned"
+        android:layout_alignBottom="@+id/addPostButton"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@+id/addPostButton" />
+
+    <EditText
+        android:id="@+id/commentsId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:inputType="numberSigned"
+        android:layout_below="@+id/textView3"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@+id/commentsButton" />
+
+</RelativeLayout>
