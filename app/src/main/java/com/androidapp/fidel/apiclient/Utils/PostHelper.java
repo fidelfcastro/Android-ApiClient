@@ -50,14 +50,18 @@ public class PostHelper {
         Cursor cursor = database.query(DBUtils.POSTS_TABLE_NAME,
                 POSTS_TABLE_COLUMNS,DBUtils.P_ID+ " = " + lId,
                 null,null,null,null);
+
+//        Cursor cursor = database.query(DBUtils.POSTS_TABLE_NAME,
+//                POSTS_TABLE_COLUMNS,null,
+//                null,null,null,null);
         cursor.moveToFirst();
         Posts oPost = parsePosts(cursor);
         cursor.close();
         return oPost;
     }
 
-    public int deletePosts(int postId){
-        return database.delete(DBUtils.POSTS_TABLE_NAME, DBUtils.POSTS_ID + " = '" + postId + "'", null);
+    public int deletePosts(){
+        return database.delete(DBUtils.POSTS_TABLE_NAME,DBUtils.POSTS_ID + " > 0", null);
     }
 
     public ArrayList<Posts> getAllPosts() {

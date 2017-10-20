@@ -3,6 +3,9 @@ package com.androidapp.fidel.apiclient;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by fidel on 10/6/2017.
  */
@@ -109,5 +112,17 @@ public class Comments implements Parcelable {
             return new Comments[size];
         }
     };
+
+    public JSONObject getJson() throws JSONException {
+        JSONObject jsonBody = new JSONObject();
+        jsonBody.put("postsId",postsId);
+        jsonBody.put("id",id);
+        jsonBody.put("name",name);
+        jsonBody.put("email",email);
+        jsonBody.put("body",body);
+
+        return jsonBody;
+
+    }
 
 }

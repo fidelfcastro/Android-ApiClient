@@ -27,7 +27,6 @@ public class CommentsActivity extends AppCompatActivity {
 
         commentsArray = this.getIntent().getParcelableArrayListExtra("Array");
         parceComments(commentsArray);
-
     }
 
     @Override

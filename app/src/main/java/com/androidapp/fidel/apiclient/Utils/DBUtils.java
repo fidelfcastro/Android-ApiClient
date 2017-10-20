@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DBUtils extends SQLiteOpenHelper {
     public static final String DATABASE_NAME = "JSONPlayHolder.db";
-    public static final int DATABASE_VERSION = 8;
+    public static final int DATABASE_VERSION = 13;
 
     public static final String POSTS_TABLE_NAME = "POSTS";
     public static final String P_ID = "_postsId";

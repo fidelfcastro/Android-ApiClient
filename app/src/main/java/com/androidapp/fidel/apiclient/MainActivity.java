@@ -12,11 +12,13 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.androidapp.fidel.apiclient.Utils.CommentsHelper;
 import com.androidapp.fidel.apiclient.Utils.PostHelper;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,9 +33,19 @@ public class MainActivity extends AppCompatActivity {
     PostAdapter oPostAdapter;
     String postId;
 
+    final String commentsUrl ="https://jsonplaceholder.typicode.com/comments";
+    final String postUrl ="https://jsonplaceholder.typicode.com/posts";
+
+//    final PostHelper pHelper = new PostHelper(getApplicationContext());
+//    final CommentsHelper cHelper = new CommentsHelper(getApplicationContext());
+
+    PostHelper pHelper;
+    CommentsHelper cHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        pHelper = new PostHelper(getApplicationContext());
+        cHelper = new CommentsHelper(getApplicationContext());
         setContentView(R.layout.activity_main);
         postResponseView = (TextView) findViewById(R.id.postTxtView);
         commentsResponseView = (TextView) findViewById(R.id.commentsTxtView);
@@ -42,99 +54,91 @@ public class MainActivity extends AppCompatActivity {
         Button viewPostButton = (Button) findViewById(R.id.viewPostButton);
         Button addCommentsButton = (Button) findViewById(R.id.commentsButton);
         Button viewCommentsButton = (Button) findViewById(R.id.viewCommentsButton);
-
-        final EditText txtPostId = (EditText) findViewById(R.id.postId);
-        final EditText txtCommentsId = (EditText) findViewById(R.id.commentsId);
+        Button expandable_button = (Button) findViewById(R.id.expandableButton);
 
         final RequestQueue queue = Volley.newRequestQueue(this);
 
         oPostAdapter = new PostAdapter(this);
-        final PostHelper pHelper = new PostHelper(getApplicationContext());
         pHelper.open();
         postArray = pHelper.getAllPosts();
         pHelper.close();
         oPostAdapter.addAll(postArray);
 
         oCommentsAdapter = new CommentsAdapter(this);
-        final CommentsHelper cHelper = new CommentsHelper(getApplicationContext());
         cHelper.open();
         commentsArray = cHelper.getAllComments();
         cHelper.close();
         oCommentsAdapter.addAll(commentsArray);
 
+        final JsonArrayRequest postsArrayRequest = new JsonArrayRequest(Request.Method.GET, postUrl,
+                null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                String result = "";
+                Posts post = new Posts();
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+                        JSONObject jsonObject = new JSONObject(response.getString(i));
+                        String userId = jsonObject.getString("userId");
+                        String id = jsonObject.getString("id");
+                        String title = jsonObject.getString("title");
+                        String body = jsonObject.getString("body");
+                        pHelper.open();
+                        post = pHelper.addPosts(id, userId, title, body);
+                        pHelper.close();
+                        postArray.add(post);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                commentsResponseView.setText(error.toString());
+            }
+        });
 
-
-//        final JsonObjectRequest jsonRequest = new JsonObjectRequest
-//                (Request.Method.GET, postUrl, null, new Response.Listener<JSONObject>() {
-//                    @Override
-//                    public void onResponse(JSONObject response) {
-//                        txtResponseView.setText(response.toString());
-//                    }
-//                }, new Response.ErrorListener() {
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//                        txtResponseView.setText(error.toString());
-//                    }
-//                });
-//
-//        final JsonArrayRequest jsonArrayRequest = new JsonArrayRequest
-//                (Request.Method.GET, postUrl, null, new Response.Listener<JSONArray>() {
-//                    @Override
-//                    public void onResponse(JSONArray response) {
-//                        for (int i = 0; i < response.length(); i++) {
-//
-//                        }
-//                    }
-//                }, new Response.ErrorListener() {
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//                        txtResponseView.setText(error.toString());
-//                    }
-//
-//                });
-
-
+        final JsonArrayRequest commentsArrayRequest = new JsonArrayRequest(Request.Method.GET, commentsUrl,
+                null, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray response) {
+                String result = "";
+                commentsArray = new ArrayList<Comments>();
+                Comments comment = new Comments();
+                for (int i = 0; i < response.length(); i++) {
+                    try {
+                        JSONObject jsonObject = new JSONObject(response.getString(i));
+                        String postId = jsonObject.getString("postId");
+                        String id = jsonObject.getString("id");
+                        String name = jsonObject.getString("name");
+                        String email = jsonObject.getString("email");
+                        String body = jsonObject.getString("body");
+                        cHelper.open();
+                        comment = cHelper.addComments(postId,id,name,email,body);
+                        cHelper.close();
+                        commentsArray.add(comment);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                commentsResponseView.setText(error.toString());
+            }
+        });
 
         addCommentsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String id = txtCommentsId.getText().toString();
-                if(id.isEmpty()){
-                    commentsResponseView.setText("Must select an ID");
-                }
-                else{
-                    String commentsUrl ="https://jsonplaceholder.typicode.com/comments/" + id;
-                    final StringRequest commentsStringRequest = new StringRequest(Request.Method.GET, commentsUrl,
-                            new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
-                                    try {
-                                        JSONObject jsonObject = new JSONObject(response);
-                                        String comments_postId = jsonObject.getString("postId");
-                                        String commentsId = jsonObject.getString("id");
-                                        String commentsName = jsonObject.getString("name");
-                                        String commentsEmail = jsonObject.getString("email");
-                                        String commentsBody = jsonObject.getString("body");
+                cHelper.open();
+                cHelper.deleteComments();
+                cHelper.close();
+                queue.add(commentsArrayRequest);
+                commentsResponseView.setText("Comments added succesfully! Click on the VIEW button to view the results");
 
-                                        cHelper.open();
-                                        Comments oComments = cHelper.addComments(comments_postId, commentsId, commentsName,commentsEmail,commentsBody);
-                                        cHelper.close();
-                                        commentsArray.add(oComments);
-                                        oCommentsAdapter.add(oComments);
-                                        oCommentsAdapter.notifyDataSetChanged();
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                    commentsResponseView.setText(response);
-                                }
-                            }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            commentsResponseView.setText(error.toString());
-                        }
-                    });
-                queue.add(commentsStringRequest);
-                }
 
             }
         });
@@ -142,57 +146,22 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), CommentsActivity.class);
-
                 intent.putExtra("Array", commentsArray);
                 startActivity(intent);
+                commentsResponseView.setText("");
             }
         });
 
         addPostButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String id = txtPostId.getText().toString();
-                if(id.isEmpty()){
-                    postResponseView.setText("Must select an ID");
-                }
-                else{
-                    String postUrl ="https://jsonplaceholder.typicode.com/posts/"+id;
-                    final StringRequest postStringRequest = new StringRequest(Request.Method.GET, postUrl,
-                            new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
-                                    try {
-                                        JSONObject jsonObject = new JSONObject(response);
-                                        String userId = jsonObject.getString("userId");
-                                        String id = jsonObject.getString("id");
-                                        String title = jsonObject.getString("title");
-                                        String body = jsonObject.getString("body");
-
-                                        pHelper.open();
-                                        Posts oPosts = pHelper.addPosts(userId, id, title,body);
-                                        pHelper.close();
-                                        postArray.add(oPosts);
-                                        oPostAdapter.add(oPosts);
-                                        oPostAdapter.notifyDataSetChanged();
-
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                    postResponseView.setText(response);
-                                }
-                            }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            postResponseView.setText(error.toString());
-                        }
-                    });
-                    queue.add(postStringRequest);
-                }
-
-
+                pHelper.open();
+                pHelper.deletePosts();
+                pHelper.close();
+                queue.add(postsArrayRequest);
+                postResponseView.setText("Posts added succesfully! Click on the VIEW button to view the results");
             }
-            });
-
+        });
 
         viewPostButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -201,6 +170,19 @@ public class MainActivity extends AppCompatActivity {
 
                 intent.putExtra("Array", postArray);
                 startActivity(intent);
+                postResponseView.setText("");
+            }
+        });
+
+        expandable_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), ExpandableListActivity.class);
+
+                intent.putExtra("PostArray", postArray);
+                intent.putExtra("CommentArray", commentsArray);
+                startActivity(intent);
+
             }
         });
 

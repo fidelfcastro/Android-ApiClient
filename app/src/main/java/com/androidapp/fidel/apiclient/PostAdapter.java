@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import org.json.JSONObject;
+
 /**
  * Created by fidel on 10/12/2017.
  */
@@ -34,4 +36,5 @@ public class PostAdapter extends ArrayAdapter<Posts> {
         txtPostBody.setText("Body:   " + oPost.getBody());
         return objectView;
     }
+
 }

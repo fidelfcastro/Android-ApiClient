@@ -3,6 +3,15 @@ package com.androidapp.fidel.apiclient;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.androidapp.fidel.apiclient.Utils.PostHelper;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 /**
  * Created by fidel on 10/6/2017.
  */
@@ -89,6 +98,19 @@ public class Posts implements Parcelable {
             return new Posts[size];
         }
     };
+
+    public JSONObject getJson() throws JSONException{
+        JSONObject jsonBody = new JSONObject();
+        jsonBody.put("userId",userId);
+        jsonBody.put("id",id);
+        jsonBody.put("title",title);
+        jsonBody.put("body",body);
+
+        return jsonBody;
+
+    }
+
+
 
 
 }

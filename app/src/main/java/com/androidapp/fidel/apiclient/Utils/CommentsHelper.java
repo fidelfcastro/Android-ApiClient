@@ -62,8 +62,8 @@ public class CommentsHelper {
         return oComments;
     }
 
-    public int deleteComments(int commentsId){
-        return database.delete(DBUtils.COMMENTS_TABLE_NAME, DBUtils.COMMENTS_ID + " = '" + commentsId + "'", null);
+    public int deleteComments(){
+        return database.delete(DBUtils.COMMENTS_TABLE_NAME, DBUtils.COMMENTS_ID + " > 0", null);
     }
 
     public ArrayList<Comments> getAllComments() {
