@@ -1,12 +1,15 @@
 package com.androidapp.fidel.apiclient;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -22,9 +25,15 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+    ProgressBar progressBar;
     TextView postResponseView;
     TextView commentsResponseView;
     ArrayList<Comments> commentsArray = new ArrayList<>();
@@ -50,11 +59,16 @@ public class MainActivity extends AppCompatActivity {
         postResponseView = (TextView) findViewById(R.id.postTxtView);
         commentsResponseView = (TextView) findViewById(R.id.commentsTxtView);
 
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.INVISIBLE);
+
         Button addPostButton = (Button) findViewById(R.id.addPostButton);
         Button viewPostButton = (Button) findViewById(R.id.viewPostButton);
         Button addCommentsButton = (Button) findViewById(R.id.commentsButton);
         Button viewCommentsButton = (Button) findViewById(R.id.viewCommentsButton);
         Button expandable_button = (Button) findViewById(R.id.expandableButton);
+        Button postAsyncTask_button = (Button) findViewById(R.id.postAsyncTaskButton);
+        Button commentAsyncTask_button = (Button) findViewById(R.id.commentsAsyncTaskButton);
 
         final RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -138,6 +152,31 @@ public class MainActivity extends AppCompatActivity {
                 cHelper.close();
                 queue.add(commentsArrayRequest);
                 commentsResponseView.setText("Comments added succesfully! Click on the VIEW button to view the results");
+            }
+        });
+
+        postAsyncTask_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new HttpAsyncTask().execute("http://jsonplaceholder.typicode.com/posts/15");
+            }
+        });
+
+        commentAsyncTask_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new HttpAsyncTask().execute("http://jsonplaceholder.typicode.com/comments/15");
+            }
+        });
+
+        addCommentsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                cHelper.open();
+                cHelper.deleteComments();
+                cHelper.close();
+                queue.add(commentsArrayRequest);
+                commentsResponseView.setText("Comments added succesfully! Click on the VIEW button to view the results");
 
 
             }
@@ -174,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        expandable_button.setOnClickListener(new View.OnClickListener() {
+                expandable_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), ExpandableListActivity.class);
@@ -182,11 +221,62 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("PostArray", postArray);
                 intent.putExtra("CommentArray", commentsArray);
                 startActivity(intent);
-
             }
         });
+    }
 
+    public static String getHTTPRequest(String url) {
 
+        URL obj = null;
+        HttpURLConnection con = null;
+        try {
+            obj = new URL(url);
+            con = (HttpURLConnection) obj.openConnection();
+            con.setRequestMethod("GET");
 
+            int responseCode = con.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                return response.toString();
+            } else {
+                return "POST request did not work.";
+            }
+        } catch (IOException e) {
+            return e.getMessage();
+        }
+
+    }
+
+    private class HttpAsyncTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected void onPreExecute() {
+            progressBar.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+        }
+
+        @Override
+        protected String doInBackground(String... urls) {
+            return getHTTPRequest(urls[0]);
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            progressBar.setVisibility(View.INVISIBLE);
+            Toast.makeText(getApplicationContext(), "Received!" + result, Toast.LENGTH_LONG).show();
+        }
     }
 }

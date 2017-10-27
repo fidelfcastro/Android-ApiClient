@@ -110,4 +110,29 @@
         android:layout_toEndOf="@+id/commentsId"
         android:text="EXPANDABLE LIST" />
 
+    <Button
+        android:id="@+id/postAsyncTaskButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/postTxtView"
+        android:layout_toEndOf="@+id/viewPostButton"
+        android:text="ASYNC" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/expandableButton"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/commentsTxtView" />
+
+    <Button
+        android:id="@+id/commentsAsyncTaskButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/postAsyncTaskButton"
+        android:layout_alignTop="@+id/viewCommentsButton"
+        android:text="async" />
+
 </RelativeLayout>
